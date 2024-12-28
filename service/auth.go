@@ -67,3 +67,75 @@ func SignupUser(payload *userSchema.RegisterUserSchema) (models.User, error){
 
 	return newUser, nil
 }
+
+func LoginUser(payload *userSchema.LoginUserSchema) (models.AuthResponse, error){
+	var user models.User
+	result := database.DB.Where("email = ?", payload.Email).First(&user)
+	if result.Error != nil{
+		return models.AuthResponse{}, result.Error
+	}
+
+	fmt.Println(user)
+
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(payload.Password))
+	if err != nil{
+		return models.AuthResponse{}, err
+	}
+
+	authResponse, err := GenerateAuthTokens(&user)
+	if err != nil{
+		return models.AuthResponse{}, err
+	}
+
+	return authResponse, nil
+}
+
+func VerifyOTP(userID uuid.UUID, otp string) error {
+	var user models.User
+
+	result := database.DB.Where("id = ? AND otp = ?", userID, otp).First(&user)
+	if result.Error != nil{
+		return result.Error
+	}
+
+	user.Verified = true
+	user.Otp = ""
+	result = database.DB.Save(&user)
+	if result.Error != nil{
+		return result.Error
+	}
+
+	return nil
+}
+
+func GenerateAuthTokens(user  *models.User) (models.AuthResponse, error){
+	access_token, err := utils.GenerateAccessToken(user)
+	if err != nil{
+		return models.AuthResponse{}, err
+	}
+
+	refresh_token, err := utils.GenerateRefreshToken(user)
+	if err != nil{
+		return models.AuthResponse{}, err
+	}
+
+	refreshTokenEntry := models.RefreshToken{
+		UserID: user.ID,
+		Token: refresh_token,
+	}
+
+	result := database.DB.Create(&refreshTokenEntry)
+	if result.Error != nil{
+		return models.AuthResponse{}, err
+	}
+
+	authResponse := models.AuthResponse{
+		UserID: user.ID,
+		AccessToken: access_token,
+		RefreshToken: refresh_token,
+		Verified: user.Verified,
+	}
+
+	return authResponse, nil
+}
+
