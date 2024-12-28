@@ -4,7 +4,9 @@ import (
 	"bookecom/config"
 	"bookecom/database"
 	"bookecom/routes"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -35,8 +37,15 @@ func main() {
 
 	apiGroup := app.Group("/v1")
 
-	routes.BookRoutes(apiGroup)	
+	routes.BookRoutes(apiGroup)
+	routes.AuthRoutes(apiGroup)	
 
+	port := os.Getenv("PORT")
+	if port == ""{
+		port = "3000"
+	}
 
-	log.Fatal(app.Listen(config.Port))
+	fmt.Printf("PORT: ", port)
+
+	log.Fatal(app.Listen(":" + config.Port))
 }
