@@ -5,7 +5,6 @@ import (
 	"bookecom/service"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 )
 
 
