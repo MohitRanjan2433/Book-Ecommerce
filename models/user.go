@@ -14,6 +14,7 @@ type User struct {
 	Password          string         `gorm:"not null" json:"-"`
 	Role              string         `gorm:"varchar(255);default:user" json:"role,omitempty"`
 	PhoneNumber       string         `gorm:"varchar(20)" json:"phone_number,omitempty"`
+	ProfileImage      string         `gorm:"varchar(255)" json:"pic,omitempty"`
 	Verified          bool           `gorm:"not null" json:"verified"`
 	Otp               string         `gorm:"not null" json:"otp"`
 	CreatedAt         time.Time      `gorm:"not null" json:"created_at,omitempty"`

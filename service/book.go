@@ -5,7 +5,11 @@ import (
 	"bookecom/models"
 	bookSchemas "bookecom/schemas/book"
 	"encoding/json"
+	"errors"
 	"strconv"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 func CreateBook(payload *bookSchemas.CreateBookSchema) (*models.Book, error){
@@ -47,7 +51,7 @@ func CreateBook(payload *bookSchemas.CreateBookSchema) (*models.Book, error){
 	return book, nil
 }
 
-func GetBookByTitleOrAuthon(title string, Author string) ([]models.Book, error){
+func GetBookByTitleOrAuthor(title string, Author string) ([]models.Book, error){
 
 	var books []models.Book
 
@@ -65,3 +69,61 @@ func GetBookByTitleOrAuthon(title string, Author string) ([]models.Book, error){
 
 	return books, nil
 }
+
+func GetBookById(bookID uuid.UUID) (*models.Book, error){
+
+	var book models.Book
+
+	if err := database.DB.First(&book, "id = ?", bookID).Error; err != nil{
+		if err == gorm.ErrRecordNotFound{
+			return nil, err
+		}
+		return nil, err
+	}
+
+	return &book, nil
+}
+
+func GetBookByIsbn(isbn string) (*models.Book, error){
+
+	var book models.Book
+
+	result := database.DB.Where("isbn = ?", isbn).First(&book)
+	if result.Error != nil{
+		return nil, result.Error
+	}
+
+	return &book, nil
+}
+
+func UpdateBook(book *models.Book) (*models.Book, error){
+
+	result := database.DB.Save(&book)
+	if result.Error != nil{
+		return nil, result.Error
+	}
+
+	return book, nil
+}
+
+func DeleteBook(userID uuid.UUID, bookID string) error{
+
+	var book models.Book
+
+	result := database.DB.First(&book, "id = ?", bookID)
+	if result.Error != nil{
+		return result.Error
+	}
+
+	if userID != book.UserID{
+		return errors.New("you are not the owner of this book")
+	}
+
+	result = database.DB.Delete(&book)
+	if result.Error != nil{
+		return result.Error
+	}
+
+	return nil
+}
+

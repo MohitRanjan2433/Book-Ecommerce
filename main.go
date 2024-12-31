@@ -39,6 +39,7 @@ func main() {
 
 	routes.BookRoutes(apiGroup)
 	routes.AuthRoutes(apiGroup)	
+	routes.OTPRoutes(apiGroup)
 
 	port := os.Getenv("PORT")
 	if port == ""{

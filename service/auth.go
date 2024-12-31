@@ -5,10 +5,13 @@ import (
 	"bookecom/database"
 	"bookecom/models"
 	userSchema "bookecom/schemas/user"
+	tokenSchema "bookecom/schemas/otp"
 	"bookecom/utils"
 	"fmt"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gofiber/fiber"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -139,3 +142,85 @@ func GenerateAuthTokens(user  *models.User) (models.AuthResponse, error){
 	return authResponse, nil
 }
 
+func ResendOTP(userID uuid.UUID) error {
+
+	otp, _ := utils.GenerateOTP(6)
+
+	result := database.DB.Model(&models.User{}).Where("id = ?", userID).Updates(models.User{
+		Otp: otp,
+	})
+
+	if result.Error != nil{
+		return result.Error
+	}
+
+	user, err := GetUserById(userID)
+	if err != nil{
+		return err
+	}
+
+	if user.Verified == true{
+		return nil
+	}
+
+	subject := "OTP Resent"
+	body := fmt.Sprintf("Dear User,\n\nWe have resent the One-Time Password (OTP) to your email.\n\n"+
+		"OTP: %s\n\n"+
+		"This OTP is valid for a limited time only. Please keep it confidential and do not share it with anyone.\n\n"+
+		"Thank you,\nThe App Team", otp)
+
+	msg := fmt.Sprintf("%s\n%s", subject, body)
+
+
+	email, err := utils.SendEmail(user.Email, msg)
+	if err != nil{
+		return err
+	}
+
+	fmt.Println(email)
+
+	return nil
+}
+
+func RefreshAccessToken(payload *tokenSchema.RefreshTokenSchema) (models.AuthResponse, error) {
+	config, err := config.LoadConfig(".")
+	if err != nil {
+		return models.AuthResponse{}, err
+	}
+
+	// Check if the provided refresh token exists in the database
+	var refreshTokenEntry models.RefreshToken
+	result := database.DB.Where("token = ?", payload.RefreshToken).First(&refreshTokenEntry)
+	if result.Error != nil {
+		return models.AuthResponse{}, fiber.NewError(fiber.StatusUnauthorized, "Invalid refresh token")
+	}
+
+	// Parse and validate the access token
+	claims := jwt.MapClaims{}
+	_, err = jwt.ParseWithClaims(payload.RefreshToken, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(config.RefreshTokenSecret), nil
+	})
+	if err != nil {
+		return models.AuthResponse{}, fiber.NewError(fiber.StatusUnauthorized, "Invalid refresh token")
+	}
+
+	var user models.User
+	user, err = GetUserById(refreshTokenEntry.UserID)
+	if err != nil {
+		return models.AuthResponse{}, fiber.NewError(fiber.StatusInternalServerError, "Failed to get user")
+	}
+	fmt.Println(user)
+	accessToken, err := utils.GenerateAccessToken(&user)
+	if err != nil {
+		return models.AuthResponse{}, fiber.NewError(fiber.StatusInternalServerError, "Failed to generate access token")
+	}
+
+	authResponse := models.AuthResponse{
+		UserID:       user.ID,
+		AccessToken:  accessToken,
+		RefreshToken: payload.RefreshToken,
+		Verified:     user.Verified,
+	}
+
+	return authResponse, nil
+}
