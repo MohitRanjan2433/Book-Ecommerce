@@ -169,15 +169,7 @@
 
 ---
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
----
-
 ## Contact
 
 For questions, contact me at:
-
-- Email: your_email@example.com
-- GitHub: https://github.com/yourusername
+- GitHub: https://github.com/MohitRanjan2433
