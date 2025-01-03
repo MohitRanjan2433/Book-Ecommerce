@@ -40,8 +40,13 @@
     ```bash
     go mod tidy
     ```
+3. Install GoAir
+   ```bash
+   go install github.com/cosmtrek/air@latest
+   air init
+   ```
 
-3. Set up environment variables by creating a `.env` file:
+4. Set up environment variables by creating a `.env` file:
 
     ```plaintext
     DB_HOST=localhost
@@ -60,10 +65,10 @@
     TIMEZONE=Asia/Shanghai
     ```
 
-4. Run the application:
+5. Run the application:
 
     ```bash
-    go run main.go
+    go run main.go || air
     ```
 
 ---
