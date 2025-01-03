@@ -24,18 +24,12 @@ func GetReviewByBookId(c *fiber.Ctx) error {
 			"message": "No reviews found",
 		})
 	}
-	
-	var rating float64
-	for _, review := range result{
-		rating = review.Rating
-	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"status": "success",
 		"message": "Reviews found",
 		"total_reviews": len(result),
 		"data": result,
-		"rating": rating,
 	})
 
 }

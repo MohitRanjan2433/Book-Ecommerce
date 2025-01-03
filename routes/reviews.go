@@ -12,6 +12,6 @@ func ReviewRoutes(group fiber.Router) {
 	reviewGroup := group.Group("/review")
 
 	reviewGroup.Post("/", middleware.TokenValidation, review.CreateReviewController)
-	reviewGroup.Get("/book/bookId", middleware.TokenValidation, review.GetReviewByBookId)
+	reviewGroup.Get("/book/:bookId", middleware.TokenValidation, review.GetReviewByBookId)
 	reviewGroup.Delete("/:reviewId", middleware.TokenValidation, review.DeleteReview)
 }
