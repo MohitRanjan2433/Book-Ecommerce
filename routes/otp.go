@@ -9,4 +9,5 @@ import (
 func OTPRoutes(group fiber.Router){
 
 	group.Post("/verify-otp/:userID", otp.VerifyOTPController)
+	group.Get("/resend", otp.ResendOTP)
 }

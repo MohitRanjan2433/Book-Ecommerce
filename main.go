@@ -40,6 +40,10 @@ func main() {
 	routes.BookRoutes(apiGroup)
 	routes.AuthRoutes(apiGroup)	
 	routes.OTPRoutes(apiGroup)
+	routes.UserRoutes(apiGroup)
+	routes.CartRoutes(apiGroup)
+	routes.OrderRoutes(apiGroup)
+	routes.ReviewRoutes(apiGroup)
 
 	port := os.Getenv("PORT")
 	if port == ""{

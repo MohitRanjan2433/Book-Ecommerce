@@ -8,11 +8,11 @@ import (
 
 	orderSchema "bookecom/schemas/order"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
 
-func CreateOrder(c *fiber.Ctx) error {
+func CreateOrderController(c *fiber.Ctx) error {
 
 	userId := c.Locals("userID").(uuid.UUID)
 	user, err := service.GetUserById(userId)

@@ -11,5 +11,4 @@ func AuthRoutes(group fiber.Router) {
 
 	authGroup.Post("/signup", auth.SignUpController)
 	authGroup.Post("/login", auth.LoginUser)
-	
 }

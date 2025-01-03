@@ -1,15 +1,22 @@
 package routes
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"bookecom/controllers/book"
+	"bookecom/middleware"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 func BookRoutes(group fiber.Router){
 
 	bookGroup := group.Group("/book")
 
-	bookGroup.Post("/", book.CreateBookController)
-	bookGroup.Get("/allBooks", book.FindAllBooks)
+	bookGroup.Post("/", middleware.TokenValidation, book.CreateBookController)
+	bookGroup.Get("/allBooks", middleware.TokenValidation, book.FindAllBooks)
+
+	bookGroup.Route("/:bookId", func(router fiber.Router) {
+		router.Get("", book.FindBookByIdController)
+		router.Delete("", middleware.TokenValidation, book.DeleteBook)
+	})
 
 }
