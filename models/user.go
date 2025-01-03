@@ -17,6 +17,7 @@ type User struct {
 	ProfileImage      string         `gorm:"varchar(255)" json:"pic,omitempty"`
 	Verified          bool           `gorm:"not null" json:"verified"`
 	Otp               string         `gorm:"not null" json:"otp"`
+	Active            bool           `gorm:"not null;default:true" json:"-"`
 	CreatedAt         time.Time      `gorm:"not null" json:"created_at,omitempty"`
 	UpdatedAt         time.Time      `gorm:"not null" json:"updated_at,omitempty"`
 	CartId            uuid.UUID      `gorm:"type:uuid" json:"cart_id,omitempty"`
