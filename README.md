@@ -1,8 +1,8 @@
-# BookEcom - Book Ecommerce Application
+# Novel Quest - Book Ecommerce Application
 
 ## Overview
 
-**BookEcom** is a book ecommerce platform designed with a backend built using **Go Fiber** . The project supports user authentication, book management, cart, orders, reviews, OTP-based registration, and more.
+**NovelQuest** is a book ecommerce platform designed with a backend built using **Go Fiber** . The project supports user authentication, book management, cart, orders, reviews, OTP-based registration, and more.
 
 ---
 
